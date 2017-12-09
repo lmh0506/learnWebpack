@@ -1,0 +1,11 @@
+.layer {
+  width: 600px;
+  height: 200px;
+  background-color: yellow;
+  background-image: url('../../assets/base.png');
+  div {
+    width: 400px;
+    height: 100px;
+    background-image: url('../../assets/bg.jpg');
+  }
+}

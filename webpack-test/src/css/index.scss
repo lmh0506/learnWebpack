@@ -1,0 +1,7 @@
+@import './common.css';
+@import './test.scss';
+$color: red;
+div{
+  color: $color;
+}
+
