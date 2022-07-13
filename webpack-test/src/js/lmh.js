@@ -1,1 +1,1 @@
-function lmh() {}
+export function lmh() {}
