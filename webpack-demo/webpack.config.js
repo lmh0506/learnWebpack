@@ -1,10 +1,13 @@
 const path = require('path')
 const webpack = require('webpack')
+const TerserPlugin = require('terser-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const CleanWebpackPlugin = require('clean-webpack-plugin')
-const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
+  mode: 'production',
+  devtool: 'eval-cheap-module-source-map',
   entry: { // 多页面需要多路口
     vendor: ['jquery', './src/js/common.js'],
     index: './src/js/index.js',
@@ -21,10 +24,7 @@ module.exports = {
         test: /\.css$/,
         include: path.join(__dirname, 'src'),
         exclude: /node_modules/,
-        use: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: 'css-loader'
-        })
+        use: [MiniCssExtractPlugin.loader, 'css-loader']
       },
       {
         test: /\.js$/,
@@ -34,12 +34,35 @@ module.exports = {
       }
     ]
   },
+  optimization: {
+    minimize: true,
+    minimizer: [
+      new TerserPlugin({
+        minify: TerserPlugin.uglifyJsMinify,
+        // `terserOptions` options will be passed to `uglify-js`
+        // Link to options - https://github.com/mishoo/UglifyJS#minify-options
+        terserOptions: {},
+      }),
+    ],
+    splitChunks: {
+      chunks: 'async',
+      minChunks: 3,
+      cacheGroups: {
+        defaultVendors: {
+          test: /[\\/]node_modules[\\/]/,
+          priority: -10,
+          reuseExistingChunk: true,
+        },
+        default: {
+          minChunks: 2,
+          priority: -20,
+          reuseExistingChunk: true,
+        },
+      },
+    }
+  },
   plugins: [
-    new CleanWebpackPlugin(['./dist'], {
-      root: path.join(__dirname, ''),
-      verbose: true,
-      dry: false
-    }),
+    new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: './src/index.html',
@@ -63,17 +86,8 @@ module.exports = {
       jQuery: 'jquery',
       'window.jQuery': 'jquery'
     }),
-    new webpack.optimize.CommonsChunkPlugin({ // 抽取公共部分
-      name: 'vendor',
-      chunks: ['index', 'cart', 'vendor'],
-      minChunks: 3
-    }),
-    new webpack.optimize.UglifyJsPlugin({ // 压缩文件
-      compress: {
-        warnings: false
-      }
-    }),
-    new ExtractTextPlugin('style.css')
-  ],
-  devtool: '#source-map'
+    new MiniCssExtractPlugin({
+      filename: "style.css"
+    })
+  ]
 }
