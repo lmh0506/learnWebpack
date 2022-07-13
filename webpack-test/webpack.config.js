@@ -1,8 +1,9 @@
 const path = require('path')
 const htmlWebpackPlugin = require('html-webpack-plugin')
-const CleanWebpackPlugin = require('clean-webpack-plugin')
+const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 
 module.exports = {
+  mode: 'production',
   entry: {
     main: './src/js/main.js',
     lmh: './src/js/lmh.js',
@@ -29,7 +30,15 @@ module.exports = {
       },
       {
         test: /\.tpl$/,
-        use: 'ejs-loader',
+        use: [
+          {
+            loader: 'ejs-loader',
+            options: {
+              esModule: false,
+              variable: 'date'
+            }
+          }
+        ],
         exclude: /(node_modules|bower_components)/,
         include: path.join(__dirname, './src/components/')
       },
@@ -43,13 +52,7 @@ module.exports = {
               importLoaders: 1 // 0 => 无 loader(默认); 1 => postcss-loader; 2 => postcss-loader, sass-loader
             }
           }, {
-            loader: 'postcss-loader',
-            options: {
-              ident: 'postcss',
-              plugins: (loader) => [
-                require('autoprefixer')()
-              ]
-            }
+            loader: 'postcss-loader'
           },{
             loader: "sass-loader" // 将 Sass 编译成 CSS
         }]
@@ -82,11 +85,7 @@ module.exports = {
     ]
   },
   plugins: [
-    new CleanWebpackPlugin(['./dist'], {
-      root: path.join(__dirname, ''),
-      verbose: true,
-      dry: false
-    }),
+    new CleanWebpackPlugin(),
     new htmlWebpackPlugin({
       template: 'index.html', // html文件模板
       filename: 'all.html', // 输出的文件名
