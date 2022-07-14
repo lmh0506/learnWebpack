@@ -4,6 +4,8 @@ const TerserPlugin = require('terser-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const TestPlugin = require("./plugin/TestPlugin");
+const ThirdPlugin = require("./plugin/ThirdPlugin");
 
 module.exports = {
   mode: 'production',
@@ -88,6 +90,8 @@ module.exports = {
     }),
     new MiniCssExtractPlugin({
       filename: "style.css"
-    })
+    }),
+    new TestPlugin(),
+    new ThirdPlugin()
   ]
 }
