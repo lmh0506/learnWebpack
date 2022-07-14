@@ -5,19 +5,21 @@ class ThirdPlugin {
   // apply方法在安装插件时，会被webpack compiler调用一次
   // apply接收一个webpack compiler
   apply(compiler) {
-    let TestPluginHooks = TestPlugin.getHooks(compiler)
-    // 自定义hook
-    TestPluginHooks.myHook.tap('TestA', (compilation, test, run) => {
-      console.log('自定义myHook执行')
-      console.log('myHook-run', compilation, test, run)
-    })
-    TestPluginHooks.diyHook.tap('TestB', (compilation, test, run) => {
-      console.log('自定义diyHook执行')
-      console.log('diyHook-run', compilation, test, run)
-    })
-
     compiler.hooks.run.tap(pluginName, (compilation) => {
       console.log('ThirdPlugin执行')
+    })
+    compiler.hooks.compilation.tap(pluginName, (compilation) => {
+      console.log('ThirdPlugin执行 compilation')
+      let TestPluginHooks = TestPlugin.getHooks(compilation)
+      // 自定义hook
+      TestPluginHooks.myHook.tap('TestA', (compilation, test, run) => {
+        console.log('自定义myHook执行')
+        console.log('myHook-run', compilation, test, run)
+      })
+      TestPluginHooks.diyHook.tap('TestB', (compilation, test, run) => {
+        console.log('自定义diyHook执行')
+        console.log('diyHook-run', compilation, test, run)
+      })
     })
   }
 }

@@ -19,18 +19,14 @@ class TestPlugin {
   // apply方法在安装插件时，会被webpack compiler调用一次
   // apply接收一个webpack compiler
   apply(compiler) {
-    let hook = TestPlugin.getHooks(compiler)
 
     compiler.hooks.run.tap(pluginName, compilation => {
       console.log('webpack 构建过程开始')
       console.log('以同步的方式触发 compile 钩子')
-      // 调用触发自定义hook
-      hook.myHook.call('a', 'b', 'c')
     })
 
     compiler.hooks.compile.tap(pluginName, compilation => {
       console.log('以同步的方式触发 compile 钩子')
-      hook.diyHook.call('aaaa', 'bbbb')
     })
 
     compiler.hooks.run.tapAsync(pluginName, (compilation, callback) => {
@@ -47,6 +43,14 @@ class TestPlugin {
     compiler.hooks.run.tapPromise(pluginName, async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
       console.log('以async await异步回调触发 run 钩子')
+    })
+
+    compiler.hooks.emit.tap(pluginName, compilation => {
+      console.log('触发 emit 钩子')
+      let hook = TestPlugin.getHooks(compilation)
+      // 调用触发自定义hook
+      hook.myHook.call('a', 'b', 'c')
+      hook.diyHook.call('aaaa', 'bbbb')
     })
   }
 }
