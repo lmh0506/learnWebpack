@@ -1,5 +1,5 @@
 const pluginName = 'TestPlugin'
-const SyncHook = require('tapable').SyncHook
+const {SyncHook, AsyncSeriesHook} = require('tapable')
 let HookMap = new WeakMap()
 
 // 插件是由一个构造函数（此构造函数上的 prototype 对象具有 apply 方法）的所实例化出来的
@@ -9,8 +9,10 @@ class TestPlugin {
     if(!hook)  {
       hook = {
         // 所有的Hook构造函数都有一个可选的参数，是一个字符串数组。相当于定义函数形参
+        // 同步钩子
         myHook: new SyncHook(['arg1', 'arg2', 'arg3']),
-        diyHook: new SyncHook(['arg1', 'arg2'])
+        // 异步串行钩子
+        diyHook: new AsyncSeriesHook(['arg1', 'arg2'])
       }
       HookMap.set(compiler, hook)
     }
@@ -20,9 +22,9 @@ class TestPlugin {
   // apply接收一个webpack compiler
   apply(compiler) {
 
-    compiler.hooks.run.tap(pluginName, compilation => {
+    compiler.hooks.run.tap(pluginName, compiler => {
       console.log('webpack 构建过程开始')
-      console.log('以同步的方式触发 compile 钩子')
+      console.log('以同步的方式触发 run 钩子')
     })
 
     compiler.hooks.compile.tap(pluginName, compilation => {
@@ -50,7 +52,7 @@ class TestPlugin {
       let hook = TestPlugin.getHooks(compilation)
       // 调用触发自定义hook
       hook.myHook.call('a', 'b', 'c')
-      hook.diyHook.call('aaaa', 'bbbb')
+      hook.diyHook.callAsync('aaaa', 'bbbb')
     })
   }
 }

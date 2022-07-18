@@ -12,14 +12,16 @@ class ThirdPlugin {
       console.log('ThirdPlugin执行 compilation')
       let TestPluginHooks = TestPlugin.getHooks(compilation)
       // 自定义hook
-      TestPluginHooks.myHook.tap('TestA', (compilation, test, run) => {
+      TestPluginHooks.myHook.tap(pluginName, (a, b, c) => {
         console.log('自定义myHook执行')
-        console.log('myHook-run', compilation, test, run)
+        console.log('myHook-run', a, b, c)
       })
-      TestPluginHooks.diyHook.tap('TestB', (compilation, test, run) => {
-        console.log('自定义diyHook执行')
-        console.log('diyHook-run', compilation, test, run)
-      })
+      TestPluginHooks.diyHook.tapAsync(pluginName, (a, b) => {
+        console.log('自定义异步diyHook执行')
+        setTimeout(() => {
+          console.log('diyHook-async-run', a, b)
+        }, 1000);
+      });
     })
   }
 }
